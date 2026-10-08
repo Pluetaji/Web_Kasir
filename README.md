@@ -25,7 +25,7 @@ Ikuti langkah ini saat pertama kali menarik kode dari GitHub ke laptop masing-ma
    git clone [https://github.com/Pluetaji/Web_Kasir.git](https://github.com/Pluetaji/Web_Kasir.git)
    cd Web_Kasir
 
-```
+
 
 2. **Install Dependencies:**
 ```bash
