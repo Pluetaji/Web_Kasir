@@ -2,7 +2,7 @@
 
 Sistem informasi manajemen kasir restoran berbasis web dengan implementasi *Role-Based Access Control* (RBAC) yang memisahkan hak akses antara fungsionalitas Kasir dan Dasbor Analitik Manajer.
 
-## Tech Stack Utama
+## 🛠️ Tech Stack Utama
 
 *   **Backend & Interaktivitas:** Laravel 11 + Livewire 3
 *   **Frontend UI:** HTML5 & Tailwind CSS
@@ -22,5 +22,54 @@ Ikuti langkah ini saat pertama kali menarik kode dari GitHub ke laptop masing-ma
 
 1. **Clone repository ini:**
    ```bash
-   git clone https://github.com/Pluetaji/Web_Kasir.git
+   git clone [https://github.com/Pluetaji/Web_Kasir.git](https://github.com/Pluetaji/Web_Kasir.git)
    cd Web_Kasir
+
+```
+
+2. **Install Dependencies:**
+```bash
+composer install
+npm install
+
+```
+
+
+3. **Setup Environment:**
+* Copy file `.env.example` menjadi `.env`.
+* Buka file `.env`, lalu sesuaikan baris koneksi database:
+`DB_DATABASE=db_kasir_restoran`
+* Jalankan perintah *generate key*:
+```bash
+php artisan key:generate
+
+```
+
+
+
+
+4. **Setup Database & Storage:**
+Pastikan MySQL menyala di lokal, lalu jalankan:
+```bash
+php artisan migrate:fresh --seed
+php artisan storage:link
+
+```
+
+
+
+## 💻 Development Commands
+
+Perintah harian yang sering digunakan selama masa pengembangan proyek:
+
+```bash
+# Menjalankan Vite dev server (hot reload CSS/JS untuk Faiz)
+npm run dev
+
+# Menjalankan Laravel server (untuk Dheka)
+php artisan serve
+
+# Membuat komponen Livewire baru (Tugas Dheka)
+php artisan make:livewire NamaComponent
+
+```
