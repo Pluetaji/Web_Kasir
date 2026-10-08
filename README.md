@@ -22,6 +22,5 @@ Ikuti langkah ini saat pertama kali menarik kode dari GitHub ke laptop masing-ma
 
 1. **Clone repository ini:**
    ```bash
-   git clone [https://github.com/Pluetaji/Web_Kasir.git]
-   (https://github.com/Pluetaji/Web_Kasir.git)
+   git clone https://github.com/Pluetaji/Web_Kasir.git
    cd Web_Kasir
