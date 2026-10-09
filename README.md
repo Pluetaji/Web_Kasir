@@ -4,7 +4,7 @@ Sistem informasi manajemen kasir restoran berbasis web dengan implementasi *Role
 
 ## 🛠️ Tech Stack Utama
 
-*   **Backend & Interaktivitas:** Laravel 11 + Livewire 3
+*   **Backend & Interaktivitas:** Laravel 13 + Livewire 3
 *   **Frontend UI:** HTML5 & Tailwind CSS
 *   **Database:** MySQL 8.0
 *   **Auth:** Laravel Breeze
