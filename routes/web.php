@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CashierController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ManagerDashboardController;
 use App\Http\Controllers\ProductController;
@@ -37,10 +38,10 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/manager/pengguna/{user}', [UserController::class, 'update'])->name('manager.pengguna.update');
     Route::put('/manager/pengguna/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('pengguna.toggleStatus');
 
-    // Kasir Route
-    Route::get('/kasir', function () {
-        return view('kasir');
-    })->name('kasir');
+    // Kasir Routes
+    Route::get('/kasir', [CashierController::class, 'index'])->name('kasir');
+    Route::post('/kasir/checkout', [CashierController::class, 'checkout'])->name('kasir.checkout');
+    Route::get('/kasir/struk/{id}', [CashierController::class, 'receipt'])->name('kasir.struk');
 
     // Logout Route
     Route::post('/logout', function (\App\Livewire\Actions\Logout $logout) {

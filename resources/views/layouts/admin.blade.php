@@ -170,8 +170,8 @@
                 <span class="material-symbols-outlined text-[20px]">point_of_sale</span>
                 <span>Buka Layar Kasir</span>
             </a>
-            <div class="relative group">
-                <div class="flex items-center justify-between p-2 rounded-xl hover:bg-surface-container-low transition-all cursor-pointer">
+            <div class="relative">
+                <div id="sidebar-profile-btn" class="flex items-center justify-between p-2 rounded-xl hover:bg-surface-container-low transition-all cursor-pointer">
                     <div class="flex items-center gap-3 min-w-0">
                         <div class="w-10 h-10 rounded-full bg-primary/10 border-2 border-primary/20 text-primary font-bold flex items-center justify-center text-[16px] shrink-0 font-headline-md">
                             {{ strtoupper(substr(auth()->user()->name ?? 'D', 0, 1)) }}
@@ -181,10 +181,10 @@
                             <span class="font-label-md text-label-md text-on-surface-variant truncate">{{ ucfirst(auth()->user()->role ?? 'Manajer') }}</span>
                         </div>
                     </div>
-                    <span class="material-symbols-outlined text-[20px] text-on-surface-variant group-hover:text-on-surface transition-colors">more_vert</span>
+                    <span class="material-symbols-outlined text-[20px] text-on-surface-variant transition-colors">more_vert</span>
                 </div>
                 <!-- Popover Menu -->
-                <div class="absolute left-0 right-0 bottom-full mb-2 hidden group-hover:block hover:block z-50 bg-white rounded-xl shadow-lg border border-slate-200 p-1.5 transition-all">
+                <div id="sidebar-profile-dropdown" class="absolute left-0 right-0 bottom-full mb-2 hidden z-50 bg-white rounded-xl shadow-lg border border-slate-200 p-1.5 transition-all">
                     <div class="px-3 py-2 border-b border-slate-100 mb-1">
                         <p class="text-xs font-semibold text-slate-800">{{ auth()->user()->name ?? 'Dheka' }} ({{ ucfirst(auth()->user()->role ?? 'Manajer') }})</p>
                         <p class="text-[11px] text-slate-500 truncate">{{ auth()->user()->email ?? 'dheka@restopos.id' }}</p>
@@ -208,7 +208,7 @@
             <div class="flex items-center gap-4">
                 <div class="flex items-center gap-2 text-on-surface-variant font-medium text-body-sm">
                     <span class="material-symbols-outlined text-[18px] text-on-surface-variant">calendar_today</span>
-                    <span>Senin, 12 Oktober 2026</span>
+                    <span>{{ \Carbon\Carbon::now()->locale('id')->translatedFormat('l, d F Y') }}</span>
                 </div>
             </div>
         </header>
@@ -219,5 +219,26 @@
     </div>
 
     @stack('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarBtn = document.getElementById('sidebar-profile-btn');
+            const sidebarDropdown = document.getElementById('sidebar-profile-dropdown');
+
+            if (sidebarBtn && sidebarDropdown) {
+                // Toggle menu on click
+                sidebarBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    sidebarDropdown.classList.toggle('hidden');
+                });
+
+                // Close menu when clicking outside
+                window.addEventListener('click', function(e) {
+                    if (!sidebarBtn.contains(e.target) && !sidebarDropdown.contains(e.target)) {
+                        sidebarDropdown.classList.add('hidden');
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
