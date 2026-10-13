@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Forms;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -29,6 +30,18 @@ class LoginForm extends Form
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
+
+        $user = User::where('email', $this->email)->first();
+
+        // Check if user account is deactivated
+        if ($user && (!$user->is_active || (isset($user->status) && in_array(strtolower($user->status), ['nonaktif', 'inactive'])))) {
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'form.email' => 'Akun Anda telah dinonaktifkan. Silakan hubungi Manajer.',
+                'email' => 'Akun Anda telah dinonaktifkan. Silakan hubungi Manajer.',
+            ]);
+        }
 
         if (! Auth::attempt($this->only(['email', 'password']), $this->remember)) {
             RateLimiter::hit($this->throttleKey());

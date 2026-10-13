@@ -28,6 +28,14 @@ class AuthenticatedSessionController extends Controller
             'password' => ['required', 'string'],
         ]);
 
+        $user = \App\Models\User::where('email', $request->email)->first();
+
+        if ($user && (!$user->is_active || (isset($user->status) && in_array(strtolower($user->status), ['nonaktif', 'inactive'])))) {
+            return back()->withErrors([
+                'email' => 'Akun Anda telah dinonaktifkan. Silakan hubungi Manajer.',
+            ]);
+        }
+
         if (! Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
             return back()->withErrors([
                 'email' => trans('auth.failed'),
