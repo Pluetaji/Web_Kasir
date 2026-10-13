@@ -20,6 +20,18 @@ new #[Layout('layouts.guest')] class extends Component
 
         Session::regenerate();
 
+        $user = auth()->user();
+
+        if ($user?->role === 'manager') {
+            $this->redirectIntended(default: '/manager', navigate: true);
+            return;
+        }
+
+        if ($user?->role === 'kasir') {
+            $this->redirectIntended(default: '/kasir', navigate: true);
+            return;
+        }
+
         $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
     }
 }; ?>

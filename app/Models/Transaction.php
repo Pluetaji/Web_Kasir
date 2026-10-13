@@ -12,8 +12,11 @@ class Transaction extends Model
         'invoice_number',
         'user_id',
         'customer_name',
+        'order_type',
         'total_price',
         'payment_method',
+        'cash_received',
+        'change_amount',
         'status',
     ];
 

@@ -16,8 +16,11 @@ return new class extends Migration
             $table->string('invoice_number')->unique();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('customer_name')->nullable();
+            $table->enum('order_type', ['Dine In', 'Take Away'])->default('Dine In');
             $table->integer('total_price');
             $table->enum('payment_method', ['Tunai', 'QRIS', 'Kartu Debit']);
+            $table->integer('cash_received')->nullable();
+            $table->integer('change_amount')->nullable();
             $table->enum('status', ['Success', 'Canceled'])->default('Success');
             $table->timestamps();
         });
