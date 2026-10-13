@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ManagerDashboardController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -19,9 +20,7 @@ Route::middleware(['auth'])->group(function () {
     Route::view('profile', 'profile')->name('profile');
 
     // Manager / Admin Routes
-    Route::get('/manager', function () {
-        return view('dashboardmanajer');
-    })->name('manager');
+    Route::get('/manager', [ManagerDashboardController::class, 'index'])->name('manager');
 
     Route::get('/manager/produk', [ProductController::class, 'index'])->name('manager.produk');
     Route::post('/manager/produk', [ProductController::class, 'store'])->name('manager.produk.store');
