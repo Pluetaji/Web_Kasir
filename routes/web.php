@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\ProductController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome');
@@ -21,18 +23,20 @@ Route::middleware(['auth'])->group(function () {
         return view('dashboardmanajer');
     })->name('manager');
 
-    Route::get('/manager/produk', function () {
-        return view('daftarproduk');
-    })->name('manager.produk');
+    Route::get('/manager/produk', [ProductController::class, 'index'])->name('manager.produk');
+    Route::post('/manager/produk', [ProductController::class, 'store'])->name('manager.produk.store');
+    Route::put('/manager/produk/{product}', [ProductController::class, 'update'])->name('manager.produk.update');
+    Route::delete('/manager/produk/{product}', [ProductController::class, 'destroy'])->name('manager.produk.destroy');
 
     Route::get('/manager/kategori', [CategoryController::class, 'index'])->name('manager.kategori');
     Route::post('/manager/kategori', [CategoryController::class, 'store'])->name('manager.kategori.store');
     Route::put('/manager/kategori/{category}', [CategoryController::class, 'update'])->name('manager.kategori.update');
     Route::delete('/manager/kategori/{category}', [CategoryController::class, 'destroy'])->name('manager.kategori.destroy');
 
-    Route::get('/manager/pengguna', function () {
-        return view('pengguna');
-    })->name('manager.pengguna');
+    Route::get('/manager/pengguna', [UserController::class, 'index'])->name('manager.pengguna');
+    Route::post('/manager/pengguna', [UserController::class, 'store'])->name('manager.pengguna.store');
+    Route::put('/manager/pengguna/{user}', [UserController::class, 'update'])->name('manager.pengguna.update');
+    Route::put('/manager/pengguna/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('pengguna.toggleStatus');
 
     // Kasir Route
     Route::get('/kasir', function () {

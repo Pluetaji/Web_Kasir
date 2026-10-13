@@ -4,274 +4,484 @@
 
 @section('content')
 <div class="flex flex-col w-full">
+    <!-- Success Alert Notification -->
+    @if (session('success'))
+        <div id="alertSuccess" class="mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-900 flex items-center justify-between shadow-xs transition-all animate-in fade-in duration-200" role="alert">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[20px]">check_circle</span>
+                </div>
+                <div>
+                    <p class="font-title-sm text-sm font-semibold">Berhasil!</p>
+                    <p class="font-body-sm text-xs text-emerald-700">{{ session('success') }}</p>
+                </div>
+            </div>
+            <button type="button" onclick="document.getElementById('alertSuccess').remove()" class="text-emerald-600 hover:text-emerald-800 p-1 rounded-lg hover:bg-emerald-100/60 transition-colors">
+                <span class="material-symbols-outlined text-[18px]">close</span>
+            </button>
+        </div>
+    @endif
+
+    <!-- Error Alert Notification -->
+    @if (session('error'))
+        <div id="alertErrorSession" class="mb-6 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-900 flex items-center justify-between shadow-xs transition-all animate-in fade-in duration-200" role="alert">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-xl bg-red-100 text-red-700 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[20px]">warning</span>
+                </div>
+                <div>
+                    <p class="font-title-sm text-sm font-semibold">Peringatan</p>
+                    <p class="font-body-sm text-xs text-red-700">{{ session('error') }}</p>
+                </div>
+            </div>
+            <button type="button" onclick="document.getElementById('alertErrorSession').remove()" class="text-red-600 hover:text-red-800 p-1 rounded-lg hover:bg-red-100/60 transition-colors">
+                <span class="material-symbols-outlined text-[18px]">close</span>
+            </button>
+        </div>
+    @endif
+
+    <!-- Validation Error Alert -->
+    @if ($errors->any())
+        <div id="alertValidation" class="mb-6 p-4 rounded-2xl bg-red-50 border border-red-200 text-red-900 flex items-center justify-between shadow-xs transition-all animate-in fade-in duration-200" role="alert">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-xl bg-red-100 text-red-700 flex items-center justify-center shrink-0">
+                    <span class="material-symbols-outlined text-[20px]">error</span>
+                </div>
+                <div>
+                    <p class="font-title-sm text-sm font-semibold">Terjadi Kesalahan</p>
+                    @foreach ($errors->all() as $error)
+                        <p class="font-body-sm text-xs text-red-700">{{ $error }}</p>
+                    @endforeach
+                </div>
+            </div>
+            <button type="button" onclick="document.getElementById('alertValidation').remove()" class="text-red-600 hover:text-red-800 p-1 rounded-lg hover:bg-red-100/60 transition-colors">
+                <span class="material-symbols-outlined text-[18px]">close</span>
+            </button>
+        </div>
+    @endif
+
     <!-- Title & Action Section -->
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div class="flex flex-col">
-            <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">Manajemen Pengguna</h1>
-            <p class="text-sm text-slate-500 mt-1">Kelola hak akses dan akun karyawan restoran.</p>
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div>
+            <h1 class="font-headline-lg text-headline-lg text-on-surface font-bold tracking-tight">Manajemen Pengguna</h1>
+            <p class="font-body-md text-body-md text-on-surface-variant mt-0.5">Kelola hak akses akun manajer dan kasir restoran Anda.</p>
         </div>
         <div>
-            <button class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#10B981] hover:bg-[#059669] text-white text-sm font-semibold transition-all shadow-sm hover:shadow active:scale-[0.98]" id="btn-tambah-pengguna" type="button" onclick="openModal()">
-                <span class="material-symbols-outlined text-[20px] font-bold">add</span>
+            <button type="button" onclick="openAddModal()" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-on-primary font-title-sm text-title-sm font-semibold shadow-sm hover:opacity-90 active:scale-[0.98] transition-all" style="background-color: rgb(5, 150, 105); color: rgb(255, 255, 255);">
+                <span class="material-symbols-outlined text-[20px]">person_add</span>
                 <span>Tambah Pengguna</span>
             </button>
         </div>
     </div>
 
     <!-- Table Container -->
-    <div class="w-full bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col mt-4">
-        <div class="w-full overflow-x-auto">
+    <div class="w-full bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden flex flex-col">
+        <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-slate-50/70 border-b border-slate-100">
-                        <th class="py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-400">NAMA PENGGUNA</th>
-                        <th class="py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-400">EMAIL</th>
-                        <th class="py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-400">PERAN</th>
-                        <th class="py-4 px-6 text-xs font-semibold uppercase tracking-wider text-slate-400">STATUS</th>
-                        <th class="py-4 px-6 text-right text-xs font-semibold uppercase tracking-wider text-slate-400">AKSI</th>
+                    <tr class="bg-surface-container-low text-on-surface-variant">
+                        <th class="py-3.5 px-6 font-label-caps text-label-caps uppercase tracking-wider font-semibold min-w-[220px]" scope="col">Nama Pengguna</th>
+                        <th class="py-3.5 px-6 font-label-caps text-label-caps uppercase tracking-wider font-semibold" scope="col">Email</th>
+                        <th class="py-3.5 px-6 font-label-caps text-label-caps uppercase tracking-wider font-semibold" scope="col">Peran</th>
+                        <th class="py-3.5 px-6 font-label-caps text-label-caps uppercase tracking-wider font-semibold" scope="col">Status</th>
+                        <th class="py-3.5 px-6 font-label-caps text-label-caps uppercase tracking-wider font-semibold text-right w-28" scope="col">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100">
-                    <!-- Row 1: Dheka -->
-                    <tr class="hover:bg-slate-50/60 transition-colors group">
-                        <td class="py-5 px-6">
-                            <div class="flex items-center gap-3.5">
-                                <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-sm font-bold shadow-xs">D</div>
-                                <div class="flex flex-col">
-                                    <span class="text-sm font-bold text-slate-900 leading-snug">Dheka Pratama</span>
-                                    <span class="text-xs text-slate-400 font-normal">Super Admin Restoran</span>
+                <tbody class="divide-y divide-surface-container-low">
+                    @forelse ($users as $user)
+                        <tr class="hover:bg-surface-container-low/60 transition-colors group">
+                            <!-- Name & Initial -->
+                            <td class="py-4 px-6 align-middle">
+                                <div class="flex items-center gap-3.5">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-sm shadow-xs shrink-0 {{ $user->role === 'manager' ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800' }}">
+                                        {{ strtoupper(substr($user->name, 0, 1)) }}
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-title-sm text-title-sm text-on-surface font-bold group-hover:text-primary transition-colors">{{ $user->name }}</span>
+                                            @if (auth()->id() === $user->id)
+                                                <span class="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-600">Anda</span>
+                                            @endif
+                                        </div>
+                                        <span class="font-body-sm text-body-sm text-on-surface-variant text-xs">ID #{{ $user->id }}</span>
+                                    </div>
                                 </div>
-                            </div>
-                        </td>
-                        <td class="py-5 px-6"><span class="text-sm text-slate-700 font-medium select-all">dheka.manager@restopos.id</span></td>
-                        <td class="py-5 px-6"><span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100/60">Manajer</span></td>
-                        <td class="py-5 px-6">
-                            <div class="flex items-center gap-2.5">
-                                <button aria-checked="true" class="toggle-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full p-0.5 transition-colors bg-[#10B981] focus:outline-none" onclick="toggleStatus(this)" role="switch" type="button">
-                                    <span class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-xs transition-transform translate-x-4"></span>
-                                </button>
-                                <span class="status-label text-xs font-semibold text-[#10B981]">Aktif</span>
-                            </div>
-                        </td>
-                        <td class="py-5 px-6 text-right">
-                            <div class="inline-flex items-center justify-end gap-1 text-slate-400">
-                                <button class="p-1.5 rounded-lg hover:bg-slate-100 hover:text-slate-700 transition-colors" title="Edit Pengguna" type="button">
-                                    <span class="material-symbols-outlined text-[19px]">edit</span>
-                                </button>
-                                <button class="p-1.5 rounded-lg hover:bg-slate-100 hover:text-slate-700 transition-colors" title="Reset Kata Sandi" type="button">
-                                    <span class="material-symbols-outlined text-[19px]">key</span>
-                                </button>
-                                <button class="p-1.5 rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors" title="Hapus Pengguna" type="button">
-                                    <span class="material-symbols-outlined text-[19px]">delete</span>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <!-- Row 2: Siti Nurhaliza -->
-                    <tr class="hover:bg-slate-50/60 transition-colors group">
-                        <td class="py-5 px-6">
-                            <div class="flex items-center gap-3.5">
-                                <div class="w-10 h-10 rounded-full bg-indigo-100 text-indigo-800 flex items-center justify-center text-sm font-bold shadow-xs">S</div>
-                                <div class="flex flex-col">
-                                    <span class="text-sm font-bold text-slate-900 leading-snug">Siti Nurhaliza</span>
-                                    <span class="text-xs text-slate-400 font-normal">Shift Pagi</span>
+                            </td>
+
+                            <!-- Email -->
+                            <td class="py-4 px-6 align-middle">
+                                <span class="font-body-md text-sm text-on-surface select-all">{{ $user->email }}</span>
+                            </td>
+
+                            <!-- Role Badge -->
+                            <td class="py-4 px-6 align-middle">
+                                @if ($user->role === 'manager')
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                        <span>Manajer</span>
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                                        <span>Kasir</span>
+                                    </span>
+                                @endif
+                            </td>
+
+                            <!-- Status Pill -->
+                            <td class="py-4 px-6 align-middle">
+                                @if ($user->is_active)
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-label-md text-xs font-semibold">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                        <span>Aktif</span>
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 border border-slate-200 font-label-md text-xs font-semibold">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                                        <span>Nonaktif</span>
+                                    </span>
+                                @endif
+                            </td>
+
+                            <!-- Actions -->
+                            <td class="py-4 px-6 align-middle text-right">
+                                <div class="flex items-center justify-end gap-1">
+                                    <button type="button" 
+                                            data-id="{{ $user->id }}"
+                                            data-name="{{ $user->name }}"
+                                            data-email="{{ $user->email }}"
+                                            data-role="{{ $user->role }}"
+                                            onclick="openEditModal(this)"
+                                            class="p-2 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" 
+                                            title="Edit Pengguna">
+                                        <span class="material-symbols-outlined text-[19px]">edit</span>
+                                    </button>
+
+                                    <!-- Quick Toggle Status Form -->
+                                    <form method="POST" action="{{ route('pengguna.toggleStatus', $user->id) }}" class="inline">
+                                        @csrf
+                                        @method('PUT')
+                                        @if (auth()->id() === $user->id)
+                                            <button type="button" disabled class="p-2 rounded-xl text-slate-300 cursor-not-allowed" title="Tidak dapat menonaktifkan akun sendiri">
+                                                <span class="material-symbols-outlined text-[19px]">lock</span>
+                                            </button>
+                                        @elseif ($user->is_active)
+                                            <button type="submit" 
+                                                    class="p-2 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 transition-colors" 
+                                                    title="Nonaktifkan Pengguna">
+                                                <span class="material-symbols-outlined text-[19px]">person_off</span>
+                                            </button>
+                                        @else
+                                            <button type="submit" 
+                                                    class="p-2 rounded-xl text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 transition-colors" 
+                                                    title="Aktifkan Pengguna">
+                                                <span class="material-symbols-outlined text-[19px]">check_circle</span>
+                                            </button>
+                                        @endif
+                                    </form>
                                 </div>
-                            </div>
-                        </td>
-                        <td class="py-5 px-6"><span class="text-sm text-slate-700 font-medium select-all">siti.kasir@restopos.id</span></td>
-                        <td class="py-5 px-6"><span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100/60">Kasir</span></td>
-                        <td class="py-5 px-6">
-                            <div class="flex items-center gap-2.5">
-                                <button aria-checked="true" class="toggle-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full p-0.5 transition-colors bg-[#10B981] focus:outline-none" onclick="toggleStatus(this)" role="switch" type="button">
-                                    <span class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-xs transition-transform translate-x-4"></span>
-                                </button>
-                                <span class="status-label text-xs font-semibold text-[#10B981]">Aktif</span>
-                            </div>
-                        </td>
-                        <td class="py-5 px-6 text-right">
-                            <div class="inline-flex items-center justify-end gap-1 text-slate-400">
-                                <button class="p-1.5 rounded-lg hover:bg-slate-100 hover:text-slate-700 transition-colors" title="Edit Pengguna" type="button">
-                                    <span class="material-symbols-outlined text-[19px]">edit</span>
-                                </button>
-                                <button class="p-1.5 rounded-lg hover:bg-slate-100 hover:text-slate-700 transition-colors" title="Reset Kata Sandi" type="button">
-                                    <span class="material-symbols-outlined text-[19px]">key</span>
-                                </button>
-                                <button class="p-1.5 rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors" title="Hapus Pengguna" type="button">
-                                    <span class="material-symbols-outlined text-[19px]">delete</span>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <!-- Row 3: Budi Santoso -->
-                    <tr class="hover:bg-slate-50/60 transition-colors group">
-                        <td class="py-5 px-6">
-                            <div class="flex items-center gap-3.5">
-                                <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-800 flex items-center justify-center text-sm font-bold shadow-xs">B</div>
-                                <div class="flex flex-col">
-                                    <span class="text-sm font-bold text-slate-900 leading-snug">Budi Santoso</span>
-                                    <span class="text-xs text-slate-400 font-normal">Shift Malam</span>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="py-12 px-6 text-center text-on-surface-variant">
+                                <div class="flex flex-col items-center justify-center gap-2">
+                                    <span class="material-symbols-outlined text-4xl text-slate-400">group_off</span>
+                                    <p class="font-title-sm text-sm font-semibold text-on-surface">Belum ada pengguna</p>
+                                    <p class="font-body-sm text-xs text-on-surface-variant">Klik tombol "Tambah Pengguna" untuk menambahkan staf restoran.</p>
                                 </div>
-                            </div>
-                        </td>
-                        <td class="py-5 px-6"><span class="text-sm text-slate-700 font-medium select-all">budi.kasir@restopos.id</span></td>
-                        <td class="py-5 px-6"><span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100/60">Kasir</span></td>
-                        <td class="py-5 px-6">
-                            <div class="flex items-center gap-2.5">
-                                <button aria-checked="true" class="toggle-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full p-0.5 transition-colors bg-[#10B981] focus:outline-none" onclick="toggleStatus(this)" role="switch" type="button">
-                                    <span class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-xs transition-transform translate-x-4"></span>
-                                </button>
-                                <span class="status-label text-xs font-semibold text-[#10B981]">Aktif</span>
-                            </div>
-                        </td>
-                        <td class="py-5 px-6 text-right">
-                            <div class="inline-flex items-center justify-end gap-1 text-slate-400">
-                                <button class="p-1.5 rounded-lg hover:bg-slate-100 hover:text-slate-700 transition-colors" title="Edit Pengguna" type="button">
-                                    <span class="material-symbols-outlined text-[19px]">edit</span>
-                                </button>
-                                <button class="p-1.5 rounded-lg hover:bg-slate-100 hover:text-slate-700 transition-colors" title="Reset Kata Sandi" type="button">
-                                    <span class="material-symbols-outlined text-[19px]">key</span>
-                                </button>
-                                <button class="p-1.5 rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors" title="Hapus Pengguna" type="button">
-                                    <span class="material-symbols-outlined text-[19px]">delete</span>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <!-- Row 4: Rian Ardiansyah -->
-                    <tr class="hover:bg-slate-50/60 transition-colors group opacity-85">
-                        <td class="py-5 px-6">
-                            <div class="flex items-center gap-3.5">
-                                <div class="w-10 h-10 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-sm font-bold shadow-xs">R</div>
-                                <div class="flex flex-col">
-                                    <span class="text-sm font-bold text-slate-900 leading-snug">Rian Ardiansyah</span>
-                                    <span class="text-xs text-slate-400 font-normal">Cadangan</span>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="py-5 px-6"><span class="text-sm text-slate-700 font-medium select-all">rian.kasir@restopos.id</span></td>
-                        <td class="py-5 px-6"><span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100/60">Kasir</span></td>
-                        <td class="py-5 px-6">
-                            <div class="flex items-center gap-2.5">
-                                <button aria-checked="false" class="toggle-switch relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full p-0.5 transition-colors bg-slate-200 focus:outline-none" onclick="toggleStatus(this)" role="switch" type="button">
-                                    <span class="pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-xs transition-transform translate-x-0"></span>
-                                </button>
-                                <span class="status-label text-xs font-semibold text-slate-400">Nonaktif</span>
-                            </div>
-                        </td>
-                        <td class="py-5 px-6 text-right">
-                            <div class="inline-flex items-center justify-end gap-1 text-slate-400">
-                                <button class="p-1.5 rounded-lg hover:bg-slate-100 hover:text-slate-700 transition-colors" title="Edit Pengguna" type="button">
-                                    <span class="material-symbols-outlined text-[19px]">edit</span>
-                                </button>
-                                <button class="p-1.5 rounded-lg hover:bg-slate-100 hover:text-slate-700 transition-colors" title="Reset Kata Sandi" type="button">
-                                    <span class="material-symbols-outlined text-[19px]">key</span>
-                                </button>
-                                <button class="p-1.5 rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors" title="Hapus Pengguna" type="button">
-                                    <span class="material-symbols-outlined text-[19px]">delete</span>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
+                            </td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
 
         <!-- Table Footer / Pagination -->
-        <div class="py-5 px-6 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-100 bg-slate-50/30">
-            <div class="text-xs text-slate-500 font-normal">
-                Menampilkan <span class="font-semibold text-slate-800">1 - 4</span> dari <span class="font-semibold text-slate-800">4</span> total pengguna
+        <div class="py-4 px-6 bg-surface-container-lowest flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-surface-container-low">
+            <div class="flex items-center gap-2">
+                <span class="font-body-sm text-body-sm text-on-surface-variant">Menampilkan</span>
+                <span class="font-body-sm text-body-sm font-bold text-on-surface">{{ $users->count() > 0 ? '1 - ' . $users->count() : '0' }}</span>
+                <span class="font-body-sm text-body-sm text-on-surface-variant">dari</span>
+                <span class="font-body-sm text-body-sm font-bold text-on-surface">{{ $users->count() }} total pengguna</span>
             </div>
+            <!-- Pagination Buttons -->
             <div class="flex items-center gap-1.5">
-                <button aria-label="Halaman Sebelumnya" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-300 cursor-not-allowed bg-transparent transition-colors" disabled="" type="button">
-                    <span class="material-symbols-outlined text-[18px]">chevron_left</span>
+                <button class="p-1.5 rounded-lg text-on-surface-variant/40 cursor-not-allowed flex items-center justify-center" disabled="" type="button">
+                    <span class="material-symbols-outlined text-[20px]">chevron_left</span>
                 </button>
-                <button class="w-8 h-8 rounded-lg bg-[#10B981] text-white text-xs font-semibold flex items-center justify-center shadow-xs" type="button">1</button>
-                <button aria-label="Halaman Berikutnya" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-300 cursor-not-allowed bg-transparent transition-colors" disabled="" type="button">
-                    <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+                <button class="w-8 h-8 rounded-lg bg-primary text-on-primary font-title-sm text-title-sm font-bold flex items-center justify-center shadow-xs" type="button" style="background-color: rgb(5, 150, 105); color: rgb(255, 255, 255);">
+                    1
+                </button>
+                <button class="p-1.5 rounded-lg text-on-surface-variant/40 cursor-not-allowed flex items-center justify-center" disabled="" type="button">
+                    <span class="material-symbols-outlined text-[20px]">chevron_right</span>
                 </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Modal Tambah Pengguna -->
-<div id="modal-tambah" class="fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center hidden p-4">
-    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-100 relative">
-        <div class="flex items-center justify-between pb-4 border-b border-slate-100">
-            <h3 class="text-lg font-bold text-slate-800">Tambah Pengguna Baru</h3>
-            <button type="button" id="btn-close-modal" class="p-1 text-slate-400 hover:text-slate-600 rounded-lg">
-                <span class="material-symbols-outlined">close</span>
+<!-- ========================================== -->
+<!-- MODAL TAMBAH PENGGUNA                       -->
+<!-- ========================================== -->
+<div id="addUserModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto transition-all">
+    <div class="bg-surface-container-lowest rounded-2xl shadow-2xl border border-slate-100 w-full max-w-md overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-150 my-8">
+        <!-- Header -->
+        <div class="px-6 py-5 border-b border-surface-container-low flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-emerald-100 text-emerald-700">
+                    <span class="material-symbols-outlined text-[20px]">person_add</span>
+                </div>
+                <div>
+                    <h3 class="font-title-sm text-title-sm text-on-surface font-bold">Tambah Pengguna Baru</h3>
+                    <p class="font-body-sm text-xs text-on-surface-variant">Daftarkan akun kasir atau manajer restoran</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeAddModal()" class="text-on-surface-variant hover:text-on-surface p-1 rounded-lg hover:bg-surface-container-low transition-colors">
+                <span class="material-symbols-outlined text-[20px]">close</span>
             </button>
         </div>
-        <form class="mt-4 space-y-4">
-            <div>
-                <label class="block text-xs font-semibold text-slate-600 mb-1">Nama Lengkap</label>
-                <input type="text" placeholder="Masukkan nama" class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500">
+
+        <!-- Form -->
+        <form method="POST" action="{{ route('manager.pengguna.store') }}">
+            @csrf
+            <div class="p-6 flex flex-col gap-4">
+                <!-- Nama Lengkap -->
+                <div>
+                    <label for="addUserName" class="block font-title-sm text-sm font-semibold text-on-surface mb-1.5">
+                        Nama Lengkap <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" 
+                           id="addUserName" 
+                           name="name" 
+                           required 
+                           placeholder="Contoh: Siti Nurhaliza" 
+                           class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-body-md font-medium text-on-surface placeholder:text-slate-400 bg-white shadow-xs transition-all">
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label for="addUserEmail" class="block font-title-sm text-sm font-semibold text-on-surface mb-1.5">
+                        Email Login <span class="text-red-500">*</span>
+                    </label>
+                    <input type="email" 
+                           id="addUserEmail" 
+                           name="email" 
+                           required 
+                           placeholder="contoh@restopos.id" 
+                           class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-body-md font-medium text-on-surface placeholder:text-slate-400 bg-white shadow-xs transition-all">
+                </div>
+
+                <!-- Peran (Role) -->
+                <div>
+                    <label for="addUserRole" class="block font-title-sm text-sm font-semibold text-on-surface mb-1.5">
+                        Peran / Hak Akses <span class="text-red-500">*</span>
+                    </label>
+                    <select id="addUserRole" 
+                            name="role" 
+                            required 
+                            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-body-md font-medium text-on-surface bg-white shadow-xs transition-all">
+                        <option value="kasir" selected>Kasir (Akses Kasir POS)</option>
+                        <option value="manager">Manajer (Akses Penuh Dashboard)</option>
+                    </select>
+                </div>
+
+                <!-- Password -->
+                <div>
+                    <label for="addUserPassword" class="block font-title-sm text-sm font-semibold text-on-surface mb-1.5">
+                        Kata Sandi <span class="text-red-500">*</span>
+                    </label>
+                    <input type="password" 
+                           id="addUserPassword" 
+                           name="password" 
+                           required 
+                           minlength="6"
+                           placeholder="Minimal 6 karakter" 
+                           class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-body-md font-medium text-on-surface placeholder:text-slate-400 bg-white shadow-xs transition-all">
+                </div>
             </div>
-            <div>
-                <label class="block text-xs font-semibold text-slate-600 mb-1">Email</label>
-                <input type="email" placeholder="contoh@restopos.id" class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500">
-            </div>
-            <div>
-                <label class="block text-xs font-semibold text-slate-600 mb-1">Peran</label>
-                <select class="w-full px-3.5 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500">
-                    <option value="kasir">Kasir</option>
-                    <option value="manager">Manajer</option>
-                </select>
-            </div>
-            <div class="pt-2 flex justify-end gap-2">
-                <button type="button" onclick="closeModal()" class="px-4 py-2 text-sm text-slate-600 hover:bg-slate-100 rounded-xl">Batal</button>
-                <button type="submit" class="px-4 py-2 text-sm bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl shadow-sm">Simpan</button>
+
+            <!-- Footer -->
+            <div class="px-6 py-4 bg-surface-container-low/50 border-t border-surface-container-low flex items-center justify-end gap-3">
+                <button type="button" onclick="closeAddModal()" class="px-4 py-2.5 rounded-xl font-title-sm text-sm font-semibold text-on-surface-variant hover:bg-surface-container-high transition-colors">
+                    Batal
+                </button>
+                <button type="submit" class="px-5 py-2.5 rounded-xl bg-primary text-on-primary font-title-sm text-sm font-semibold shadow-sm hover:opacity-90 active:scale-[0.98] transition-all" style="background-color: rgb(5, 150, 105); color: rgb(255, 255, 255);">
+                    Simpan Pengguna
+                </button>
             </div>
         </form>
     </div>
 </div>
 
+<!-- ========================================== -->
+<!-- MODAL EDIT PENGGUNA                         -->
+<!-- ========================================== -->
+<div id="editUserModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto transition-all">
+    <div class="bg-surface-container-lowest rounded-2xl shadow-2xl border border-slate-100 w-full max-w-md overflow-hidden transform transition-all animate-in fade-in zoom-in-95 duration-150 my-8">
+        <!-- Header -->
+        <div class="px-6 py-5 border-b border-surface-container-low flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center bg-emerald-100 text-emerald-700">
+                    <span class="material-symbols-outlined text-[20px]">edit</span>
+                </div>
+                <div>
+                    <h3 class="font-title-sm text-title-sm text-on-surface font-bold">Edit Pengguna</h3>
+                    <p class="font-body-sm text-xs text-on-surface-variant">Perbarui profil, peran, atau status pengguna</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeEditModal()" class="text-on-surface-variant hover:text-on-surface p-1 rounded-lg hover:bg-surface-container-low transition-colors">
+                <span class="material-symbols-outlined text-[20px]">close</span>
+            </button>
+        </div>
+
+        <!-- Form -->
+        <form id="editUserForm" method="POST" action="">
+            @csrf
+            @method('PUT')
+            <div class="p-6 flex flex-col gap-4">
+                <!-- Nama Lengkap -->
+                <div>
+                    <label for="editUserName" class="block font-title-sm text-sm font-semibold text-on-surface mb-1.5">
+                        Nama Lengkap <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" 
+                           id="editUserName" 
+                           name="name" 
+                           required 
+                           class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-body-md font-medium text-on-surface placeholder:text-slate-400 bg-white shadow-xs transition-all">
+                </div>
+
+                <!-- Email -->
+                <div>
+                    <label for="editUserEmail" class="block font-title-sm text-sm font-semibold text-on-surface mb-1.5">
+                        Email Login <span class="text-red-500">*</span>
+                    </label>
+                    <input type="email" 
+                           id="editUserEmail" 
+                           name="email" 
+                           required 
+                           class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-body-md font-medium text-on-surface placeholder:text-slate-400 bg-white shadow-xs transition-all">
+                </div>
+
+                <!-- Peran (Role) -->
+                <div>
+                    <label for="editUserRole" class="block font-title-sm text-sm font-semibold text-on-surface mb-1.5">
+                        Peran / Hak Akses <span class="text-red-500">*</span>
+                    </label>
+                    <select id="editUserRole" 
+                            name="role" 
+                            required 
+                            class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-body-md font-medium text-on-surface bg-white shadow-xs transition-all">
+                        <option value="kasir">Kasir (Akses Kasir POS)</option>
+                        <option value="manager">Manajer (Akses Penuh Dashboard)</option>
+                    </select>
+                </div>
+
+                <!-- Password (Optional) -->
+                <div>
+                    <label for="editUserPassword" class="block font-title-sm text-sm font-semibold text-on-surface mb-1.5">
+                        Kata Sandi Baru
+                    </label>
+                    <input type="password" 
+                           id="editUserPassword" 
+                           name="password" 
+                           minlength="6"
+                           placeholder="Kosongkan jika tidak ingin mengubah password" 
+                           class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent text-body-md font-medium text-on-surface placeholder:text-slate-400 bg-white shadow-xs transition-all">
+                    <p class="text-[11px] text-on-surface-variant mt-1">Biarkan kosong untuk mempertahankan kata sandi saat ini.</p>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-6 py-4 bg-surface-container-low/50 border-t border-surface-container-low flex items-center justify-end gap-3">
+                <button type="button" onclick="closeEditModal()" class="px-4 py-2.5 rounded-xl font-title-sm text-sm font-semibold text-on-surface-variant hover:bg-surface-container-high transition-colors">
+                    Batal
+                </button>
+                <button type="submit" class="px-5 py-2.5 rounded-xl bg-primary text-on-primary font-title-sm text-sm font-semibold shadow-sm hover:opacity-90 active:scale-[0.98] transition-all" style="background-color: rgb(5, 150, 105); color: rgb(255, 255, 255);">
+                    Simpan Perubahan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- JavaScript Interactivity -->
 <script>
-    function toggleStatus(button) {
-        const isChecked = button.getAttribute('aria-checked') === 'true';
-        const thumb = button.querySelector('span');
-        const label = button.parentElement.querySelector('.status-label');
+    const userBaseUrl = "{{ url('/manager/pengguna') }}";
 
-        if (isChecked) {
-            button.setAttribute('aria-checked', 'false');
-            button.classList.remove('bg-[#10B981]');
-            button.classList.add('bg-slate-200');
-            thumb.classList.remove('translate-x-4');
-            thumb.classList.add('translate-x-0');
-            label.textContent = 'Nonaktif';
-            label.classList.remove('text-[#10B981]');
-            label.classList.add('text-slate-400');
-        } else {
-            button.setAttribute('aria-checked', 'true');
-            button.classList.remove('bg-slate-200');
-            button.classList.add('bg-[#10B981]');
-            thumb.classList.remove('translate-x-0');
-            thumb.classList.add('translate-x-4');
-            label.textContent = 'Aktif';
-            label.classList.remove('text-slate-400');
-            label.classList.add('text-[#10B981]');
+    // --- Modal Tambah Pengguna ---
+    function openAddModal() {
+        const modal = document.getElementById('addUserModal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        setTimeout(() => {
+            const input = document.getElementById('addUserName');
+            if (input) input.focus();
+        }, 50);
+    }
+
+    function closeAddModal() {
+        const modal = document.getElementById('addUserModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+        const form = modal.querySelector('form');
+        if (form) form.reset();
+    }
+
+    // --- Modal Edit Pengguna ---
+    function openEditModal(button) {
+        const modal = document.getElementById('editUserModal');
+        const form = document.getElementById('editUserForm');
+        
+        const id = button.dataset.id;
+        const name = button.dataset.name;
+        const email = button.dataset.email;
+        const role = button.dataset.role;
+
+        form.action = `${userBaseUrl}/${id}`;
+
+        document.getElementById('editUserName').value = name || '';
+        document.getElementById('editUserEmail').value = email || '';
+        document.getElementById('editUserRole').value = role || 'kasir';
+        document.getElementById('editUserPassword').value = '';
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        setTimeout(() => {
+            const input = document.getElementById('editUserName');
+            if (input) {
+                input.focus();
+                input.select();
+            }
+        }, 50);
+    }
+
+    function closeEditModal() {
+        const modal = document.getElementById('editUserModal');
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    // Close on Escape key
+    window.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeAddModal();
+            closeEditModal();
         }
-    }
+    });
 
-    const modal = document.getElementById('modal-tambah');
-    const btnTambah = document.getElementById('btn-tambah-pengguna');
-    const btnClose = document.getElementById('btn-close-modal');
-
-    function openModal() {
-        if (modal) modal.classList.remove('hidden');
-    }
-
-    function closeModal() {
-        if (modal) modal.classList.add('hidden');
-    }
-
-    if (btnTambah) btnTambah.addEventListener('click', openModal);
-    if (btnClose) btnClose.addEventListener('click', closeModal);
-    if (modal) {
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) closeModal();
-        });
-    }
+    // Close when clicking on backdrop
+    ['addUserModal', 'editUserModal'].forEach(function(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    if (modalId === 'addUserModal') closeAddModal();
+                    if (modalId === 'editUserModal') closeEditModal();
+                }
+            });
+        }
+    });
 </script>
 @endsection
